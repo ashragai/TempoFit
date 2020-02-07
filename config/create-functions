@@ -1,0 +1,18 @@
+#!/bin/bash
+cwd=`pwd`
+blocks=(0)
+for blk in "${blocks[@]}"
+do
+    echo Creating averaging function for block $blk 
+    sed "s/BLOCK/$blk/g" config/avg-function.yml > $cwd/tmp.yml
+    apache-pulsar-2.5.0/bin/pulsar-admin functions create --function-config-file $cwd/tmp.yml
+    echo Creating getter function for block $blk 
+    sed "s/BLOCK/$blk/g" config/getter-function.yml > $cwd/tmp.yml
+    apache-pulsar-2.5.0/bin/pulsar-admin functions create --function-config-file $cwd/tmp.yml
+    echo Creating queryer function for block $blk 
+    sed "s/BLOCK/$blk/g" config/queryer-function.yml > $cwd/tmp.yml
+    apache-pulsar-2.5.0/bin/pulsar-admin functions create --function-config-file $cwd/tmp.yml
+    sleep 2
+done
+rm $cwd/tmp.yml
+

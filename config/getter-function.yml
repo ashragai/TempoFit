@@ -1,0 +1,11 @@
+py: /home/ubuntu/pyPulsar-functions/sample-getter.py
+tenant: public
+namespace: default
+name: getter-block-BLOCK
+inputs: 
+- avg-output-BLOCK
+- query-output-BLOCK
+output: query-input-BLOCK
+className: sample-getter.getSongs
+userConfig: 
+    block: BLOCK

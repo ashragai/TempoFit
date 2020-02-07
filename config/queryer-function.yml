@@ -1,0 +1,10 @@
+py: /home/ubuntu/pyPulsar-functions/sample-queryer.py
+tenant: public
+namespace: default
+name: query-block-BLOCK
+inputs: 
+- query-input-BLOCK
+output: query-output-BLOCK
+className: sample-queryer.queryMSongs
+userConfig:
+    dash: 'persistent://public/default/test-out'

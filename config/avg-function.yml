@@ -1,0 +1,10 @@
+py: /home/ubuntu/pyPulsar-functions/sample-avger.py
+tenant: public
+namespace: default
+name: avg-block-BLOCK
+inputs: 
+- input-block-BLOCK
+output: avg-output-BLOCK
+className: sample-avger.runningAvg
+userConfig:
+    block: BLOCK

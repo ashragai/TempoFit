@@ -1,0 +1,11 @@
+#!/bin/bash
+cwd=`pwd`
+functions=(0, 1)
+for func in "${functions{@]}"
+do
+    echo Deleting function $func
+    apache-pulsar-2.5.0/bin/pulsar-admin functions delete --name $func
+
+    sleep 2
+done
+
