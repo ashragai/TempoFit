@@ -28,55 +28,69 @@ def readWorkouts(file, numLines, block_size):
         header = next(reader)
         for ii in range(numLines):
             workout_block = int(ii/block_size)
-            print "Reading line {} and placing on block {}".format(ii, workout_block)
-            if ii % block_size == 0:            
-                user_data[workout_block]['producer'] = generateProducer(workout_block) 
-                print "Producer for block {} generated successfully...".format(workout_block)
+            #print "Reading line {} and placing on block {}".format(ii, workout_block)
+            if ii % block_size == 0:
+                print "Generating producer for block ", workout_block
+                user_data[workout_block]['producer'] = generateProducer(workout_block)
+                print "Producer created successfully..."
                 user_data[workout_block]['timestamp'] = []
                 user_data[workout_block]['heartrate'] = []
             workout = next(reader)
-            heart_rate, timestamp = ast.literal_eval(workout[3]), ast.literal_eval(workout[-3])
+            timestamp, heart_rate = ast.literal_eval(workout[1]), ast.literal_eval(workout[2])
             t0 = timestamp[0]
             timestamp = [x - t0 for x in timestamp]
             user_data[workout_block]['timestamp'].append(iter(timestamp))
             user_data[workout_block]['heartrate'].append(iter(heart_rate))
+    print "Data written to dict"
     return user_data
+
+def send_callback(res, msg):
+    pass
 
 #walks through  a block of user data and publishes to the block's input Pulsar function
 #topic schema is [user-id, time, heartrate]
 #returns True if every user in the block has published all data
-def publishData(block, delay = 0.1):
-    num_users = len(block['timestamp'])
+def publishData(block, block_size, delay = 0.0001):
+    N = len(block['timestamp'])
     pd = block['producer']
     block_complete = True
-    for ii in range(num_users):
+    t1 = time.time()
+    recs = 0
+    for ii in range(N):
         try:
             msg = [ii, next(block['timestamp'][ii]), next(block['heartrate'][ii])]
-            print msg
-            block_complete = False
-            pd.send(str(msg)).encode('utf-8')
+            if ii == 0:
+                print msg
+            if block_complete:
+                block_complete = False
+            pd.send_async(str(msg).encode('utf-8'), send_callback)
+            recs += 1
             time.sleep(delay)
-        except:
+        except Exception as e:
+            print e
             pass
+    if recs != 0:
+        print "Published {} events at rate {}".format(recs, (time.time() -t1)/recs)
+    else:
+        print "Failed to publish the records :-("
     return block_complete
 
 def main(file_name):
-    numLines = 100
-    block_size = 100
-    lag = 0.25
+    numLines = 1000
+    block_size = 1000
+    lag = 2.0
     to_publish = readWorkouts(str(file_name), numLines, block_size)
-    blk_stat = [True] * len(to_publish)
+    blk_done = [False] * len(to_publish)
     while True:
         for blk in to_publish:
-            if blk_stat:
+            if not blk_done[blk]:
                 print "Publishing data from block ", blk
-                publishData(to_publish[blk])
-                time.sleep(lag)
-        if not all(blk_stat):
+                blk_done[blk] = publishData(to_publish[blk], block_size)
+        time.sleep(lag)
+        if all(blk_done):
             break
 
 #reads workout data in a csv file, stores the data in a dictionary in blocks
-#each block is then published to its own topic 
+#each block is then published to its own topic
 if __name__ == '__main__':
     main(sys.argv[1])
-

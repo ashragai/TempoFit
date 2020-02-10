@@ -15,14 +15,14 @@ class runningAvg(Function):
       return str([idn, hr, ts])
     usrInfo = self.usr_info[idn]
     dt = ts - usrInfo['prev_t']
-    if (usrInfo['interval'] + dt) >= 60:
+    if (usrInfo['interval'] + dt) >= 120 and len(usrInfo['delta_t']) != 0:
       usrInfo['interval'] += (dt - usrInfo['delta_t'][0])
       usrInfo['hr'].rotate(-1)
       usrInfo['hr'][-1] = hr
       usrInfo['delta_t'].rotate(-1)
       usrInfo['delta_t'][-1] = dt
     else:
-      usrInfo['interval'] += dt 
+      usrInfo['interval'] += dt
       usrInfo['delta_t'].append(dt)
       usrInfo['hr'].append(hr)
     usrInfo['prev_t'] = ts

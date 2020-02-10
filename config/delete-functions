@@ -1,11 +1,14 @@
 #!/bin/bash
-cwd=`pwd`
-functions=(0, 1)
-for func in "${functions{@]}"
+
+blocks=(0)
+for blk in "${blocks[@]}"
 do
-    echo Deleting function $func
-    apache-pulsar-2.5.0/bin/pulsar-admin functions delete --name $func
+    echo Deleting avg-function-$blk
+    apache-pulsar-2.5.0/bin/pulsar-admin functions delete --name avg-block-$blk
+    echo Deleting getter-function-$blk
+    apache-pulsar-2.5.0/bin/pulsar-admin functions delete --name getter-block-$blk
+    echo Deleting query-function-$blk
+    apache-pulsar-2.5.0/bin/pulsar-admin functions delete --name query-block-$blk
 
     sleep 2
 done
-
