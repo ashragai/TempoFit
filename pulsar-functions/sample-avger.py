@@ -5,6 +5,7 @@ import pickle
 import ast
 from collections import deque, defaultdict
 
+#Tabulates a running average of users' heart rates over a defined interval
 class runningAvg(Function):
   def __init__(self):
     self.usr_info = defaultdict(dict) 
