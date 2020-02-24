@@ -22,23 +22,17 @@ class getSongs(Function):
             idn, avgHR, t = input.split(',')
             avgHR, t = float(avgHR), int(t)
             if t == 0:
-                self.usr_info[idn]['song-list'] = deque()
                 self.usr_info[idn]['t-end'] = 0
                 self.usr_info[idn]['q-stat'] = False
-                return str([idn, avgHR, []])
+                return "{},{}".format(idn, avgHR)
             elif ((self.usr_info[idn]['t-end'] - t) < self.window and (self.usr_info[idn]['q-stat'] is False)):
                 self.usr_info[idn]['q-stat'] =True
-                return str([idn, avgHR, list(self.usr_info[idn]['song-list'])])
+                return "{},{}".format(idn, avgHR)
             else:
                 return
         else:
-            idn, songid, duration = input.split('|')
+            idn, duration = input.split(',')
             duration = float(duration)
-            if len(self.usr_info[idn]['song-list']) < self.numSongs:
-                self.usr_info[idn]['song-list'].append(songid)
-            else:
-                self.usr_info[idn]['song-list'].rotate(-1)
-                self.usr_info[idn]['song-list'][-1] = songid
-            self.usr_info[idn]['t-end'] += int(duration)
+            self.usr_info[idn]['t-end'] += duration
             self.usr_info[idn]['q-stat'] = False
             return
